@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Identity Security | Aether-Chasm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'scan': 'scan 3s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #06b6d4;
+            --danger: #ef4444;
+        }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+            perspective: 2000px;
+        }
+        .aether-surface {
+            transform-style: preserve-3d;
+            transform: rotateX(2deg);
+            transition: transform 0.5s ease;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, var(--accent), var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .terminal-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.2;
+        }
+        .slot-machine {
+            display: inline-block;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="flex flex-col relative min-h-screen">
+
+    <!-- Active Shield Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- LunaPhoenix Terminal Overlay -->
+    <div id="terminal-overlay" class="fixed top-0 left-0 w-full h-0 bg-black/90 z-[100] overflow-hidden transition-all duration-500 border-b border-indigo-500/50">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="ml-4 font-mono text-xs text-indigo-400 font-bold uppercase tracking-widest">Aether-Chasm Direct Link // LunaPhoenix Kernel</span>
+                </div>
+                <span class="text-[10px] text-gray-500 font-mono">ENCRYPTED // Q-RESISTANT</span>
+            </div>
+            <div id="terminal-content" class="flex-grow terminal-log text-green-400/80 overflow-y-auto space-y-1">
+                <div>[SYSTEM] Booting Aether-Chasm Security Layer...</div>
+                <div>[KERNEL] Initializing Lattice-Based PQC Signatures... OK</div>
+                <div>[SENTINEL] Polling Hardware TPM State... OK</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="glass-panel sticky top-0 z-50 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center gap-4 group cursor-pointer">
+                    <div class="h-10 w-10 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)] group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="font-bold text-xl tracking-tighter uppercase italic">EduTech <span class="text-gradient">Aether</span></span>
+                </div>
+                <div class="flex space-x-4 items-center">
+                    {% if current_user.is_authenticated %}
+                        <div class="hidden md:flex items-center gap-2 text-[10px] font-mono text-cyan-400 bg-cyan-950/30 px-2 py-1 rounded border border-cyan-500/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            SECURE_NODE: {{ current_user.id }}
+                        </div>
+                        <a href="{{ url_for('profile.dashboard') }}" class="text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors">Portal</a>
+                        <a href="{{ url_for('profile.security_settings') }}" class="text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors">Security</a>
+                        <a href="{{ url_for('auth.logout') }}" class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white px-5 py-2 rounded text-xs font-bold transition-all transition-all">DE-LINK</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors">Link</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 w-full max-w-7xl mx-auto aether-surface animate-fade-in-up">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-8 w-full max-w-lg mx-auto z-50 fixed top-24 left-1/2 transform -translate-x-1/2 space-y-2">
+                {% for category, message in messages %}
+                    <div class="glass-panel p-4 rounded border-l-4 {{ 'border-emerald-500' if category == 'success' else 'border-rose-500' }} flex items-center shadow-2xl animate-fade-in-up">
+                        <div class="font-mono text-xs font-bold uppercase tracking-widest {{ 'text-emerald-400' if category == 'success' else 'text-rose-400' }}">
+                            [{{ category }}] {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+    
+    <footer class="mt-auto py-10 px-8 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-white/5 bg-black/40 backdrop-blur-xl">
+        <div class="flex flex-col gap-1">
+            <p class="font-black text-xs tracking-[0.2em] text-gray-500 uppercase">System Identity // <span class="text-indigo-500">PRJN26-175</span></p>
+            <p class="text-[10px] font-mono text-gray-600 uppercase">Aether-Chasm Protocol v2.0.4-Lattice</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 group cursor-help">
+                <div class="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_var(--accent)] animate-pulse"></div>
+                <span class="text-[10px] font-mono text-cyan-500/80 uppercase font-bold tracking-widest">Quantum Resistant Armor Enabled</span>
+            </div>
+            <div class="h-4 w-px bg-white/10"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-mono text-emerald-500/80 uppercase font-bold tracking-widest">Hardware Link Active</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- UI Logic Scripts -->
+    <script>
+        // Particle Web Engine
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let threatLevel = 0; // 0 to 1
+
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<80; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const color = threatLevel > 0.5 ? `239, 68, 68` : `99, 102, 241`;
+            ctx.strokeStyle = `rgba(${color}, ${0.1 + (threatLevel * 0.3)})`;
+            ctx.fillStyle = `rgba(${color}, ${0.4 + (threatLevel * 0.4)})`;
+
+            particles.forEach((p, i) => {
+                p.x += p.vx * (1 + threatLevel * 5);
+                p.y += p.vy * (1 + threatLevel * 5);
+
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                for(let j=i+1; j<particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(dist < 150) {
+                        ctx.lineWidth = (150 - dist) / 100;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        drawParticles();
+
+        // LunaPhoenix Terminal Control
+        document.addEventListener('keydown', (e) => {
+            if(e.ctrlKey && e.key === '~') {
+                e.preventDefault();
+                const overlay = document.getElementById('terminal-overlay');
+                overlay.style.height = overlay.style.height === '40%' ? '0' : '40%';
+                logToTerminal(`[UI] Toggling Command Interface... ${overlay.style.height === '40%' ? 'OPEN' : 'CLOSED'}`);
+            }
+        });
+
+        function logToTerminal(msg) {
+            const container = document.getElementById('terminal-content');
+            if(!container) return;
+            const div = document.createElement('div');
+            const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+            div.innerHTML = `<span class="opacity-40">[${now}]</span> ${msg}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Sentinel Protection Module
+        const Sentinel = {
+            KEY_NAME: "aether_chasm_sentinel_v2",
+            ALGO: {
+                name: "RSASSA-PKCS1-v1_5",
+                modulusLength: 2048,
+                publicExponent: new Uint8Array([1, 0, 1]),
+                hash: "SHA-256"
+            },
+
+            async linkHardware() {
+                try {
+                    logToTerminal("[SENTINEL] Initializing Hardware Link...");
+                    const keyPair = await window.crypto.subtle.generateKey(
+                        this.ALGO,
+                        false, // non-exportable private key
+                        ["sign", "verify"]
+                    );
+                    
+                    // Save private key to IndexedDB (Secure store)
+                    const db = await this._getDB();
+                    const tx = db.transaction("keys", "readwrite");
+                    tx.objectStore("keys").put(keyPair.privateKey, this.KEY_NAME);
+                    
+                    // Export public key to PEM
+                    const exported = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+                    const pem = this._arrayBufferToPem(exported, "PUBLIC KEY");
+                    
+                    const nodeId = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                                        .map(b => b.toString(16).padStart(2, '0')).join('');
+
+                    logToTerminal("[SENTINEL] Transmitting Public Signature to Kernel...");
+                    const response = await fetch('/auth/register-sentinel', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ public_key: pem, node_id: nodeId })
+                    });
+                    
+                    const data = await response.json();
+                    if(data.status === 'ok') {
+                        logToTerminal("[SENTINEL] Hardware Bound Successfully.");
+                        window.location.reload();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } catch (e) {
+                    logToTerminal(`[SENTINEL] Error: ${e.message}`);
+                }
+            },
+
+            async signChallenge(nonce) {
+                try {
+                    logToTerminal("[SENTINEL] Processing Hardware Handshake...");
+                    const db = await this._getDB();
+                    const privateKey = await new Promise((resolve) => {
+                        db.transaction("keys").objectStore("keys").get(this.KEY_NAME).onsuccess = (e) => resolve(e.target.result);
+                    });
+
+                    if(!privateKey) throw new Error("Hardware Key Not Found.");
+
+                    const signature = await window.crypto.subtle.sign(
+                        this.ALGO,
+                        privateKey,
+                        new TextEncoder().encode(nonce)
+                    );
+
+                    return btoa(String.fromCharCode(...new Uint8Array(signature)));
+                } catch (e) {
+                    logToTerminal(`[SENTINEL] Handshake Failed: ${e.message}`);
+                    return null;
+                }
+            },
+
+            _getDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open("AetherChasm", 1);
+                    req.onupgradeneeded = () => req.result.createObjectStore("keys");
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+
+            _arrayBufferToPem(buffer, label) {
+                const binary = String.fromCharCode(...new Uint8Array(buffer));
+                const base64 = btoa(binary);
+                const lines = base64.match(/.{1,64}/g) || [];
+                return `-----BEGIN ${label}-----\n${lines.join('\n')}\n-----END ${label}-----`;
+            }
+        };
+    </script>
+</body>
+</html>
+</body>
+</html>

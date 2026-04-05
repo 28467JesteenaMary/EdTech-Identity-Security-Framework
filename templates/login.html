@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-full flex items-center justify-center w-full mt-24">
+    <div class="glass-panel p-1 border-white/10 rounded-3xl max-w-4xl w-full relative overflow-hidden">
+        <div class="flex flex-col lg:flex-row rounded-[22px] overflow-hidden">
+            
+            <!-- Branding/Visual -->
+            <div class="hidden lg:flex lg:w-5/12 bg-indigo-950/20 p-12 flex-col justify-between relative border-r border-white/5">
+                <div class="relative z-10">
+                    <div class="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-10 border border-indigo-500/30">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-6">Identity <br><span class="text-gradient">Armor</span></h1>
+                    <p class="text-xs font-mono text-gray-500 leading-relaxed uppercase tracking-widest">Aether-Chasm Protocol v2.0 // Multi-Factor Isolation Environment</p>
+                </div>
+                
+                <div class="relative z-10">
+                    <p class="text-[10px] font-mono text-indigo-400 italic">"Security is not a product, but a process."</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="w-full lg:w-7/12 p-10 lg:p-16 bg-black/40">
+                <div class="mb-10">
+                    <h2 class="text-2xl font-black uppercase italic tracking-tight mb-2">Decrypt Access</h2>
+                    <p class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Enter primary credentials for mesh verification.</p>
+                </div>
+
+                <form class="space-y-6" action="{{ url_for('auth.login') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="space-y-4">
+                        <div class="group">
+                            <label class="block text-[10px] font-mono text-gray-600 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Credential_ID</label>
+                            <input name="email" type="email" required class="w-full bg-black/20 border border-white/10 rounded-lg p-4 text-xs font-mono text-white focus:outline-none focus:border-indigo-500 transition-all" placeholder="user@identity.edu">
+                        </div>
+                        <div class="group">
+                            <label class="block text-[10px] font-mono text-gray-600 uppercase tracking-widest mb-2 group-focus-within:text-indigo-400 transition-colors">Access_Cipher</label>
+                            <input name="password" type="password" required class="w-full bg-black/20 border border-white/10 rounded-lg p-4 text-xs font-mono text-white focus:outline-none focus:border-indigo-500 transition-all" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all">
+                        Initiate Handshake
+                    </button>
+                </form>
+
+                <div class="mt-10 relative">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/5"></div></div>
+                    <div class="relative flex justify-center"><span class="px-4 bg-black/40 text-[8px] font-mono text-gray-600 uppercase tracking-[0.3em]">Alternate Vector</span></div>
+                </div>
+
+                <div class="mt-6">
+                    <a href="{{ url_for('auth.google_login') }}" class="w-full flex items-center justify-center py-3 border border-white/10 rounded-lg hover:bg-white/5 transition-all">
+                        <svg class="h-4 w-4 mr-3" viewBox="0 0 24 24"><path fill="#fff" d="M12.48 10.92v3.28h7.84c-.24 1.84-2.21 5.39-7.84 5.39-4.84 0-8.79-4.01-8.79-8.92s3.95-8.92 8.79-8.92c2.75 0 4.59 1.15 5.64 2.16l2.59-2.5C18.91 1.42 15.93 0 12.48 0 5.59 0 0 5.59 0 12.48S5.59 24.96 12.48 24.96c7.19 0 11.96-5.05 11.96-12.18 0-.81-.09-1.43-.2-2.05h-11.76z"/></svg>
+                        <span class="text-[10px] font-mono text-gray-300 uppercase tracking-widest">Google SSO Proxy</span>
+                    </a>
+                </div>
+
+                <p class="mt-10 text-center text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+                    No registry? <a href="{{ url_for('auth.register') }}" class="text-indigo-400 hover:text-indigo-300 underline underline-offset-4">Generate Node</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
